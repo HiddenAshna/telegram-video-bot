@@ -3,56 +3,58 @@ import subprocess
 import os
 
 # --- GET DETAILS FROM GITHUB SECRETS ---
-BOT_TOKEN = os.environ.get("7592519816:AAG8_NU1A8cUw6jf0YuWnjReSRag08rpdJc")
-CHAT_ID = os.environ.get("1566333943")
-YOUTUBE_CHANNEL_URL = "https://inv.odyssey346.dev/@catchthedit" # Change this to your desired channel
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+CHAT_ID = os.environ.get("CHAT_ID")
+
+# --- PASTE YOUR DETAILS HERE ---
+SOUNDCLOUD_USER_URL = "https://soundcloud.com/xosri" # Replace with the target SoundCloud user's URL
 
 # --- SCRIPT LOGIC (No need to edit below this line) ---
 
-# 1. Download the latest video using yt-dlp
-# The command finds the latest video from the channel's "shorts" page and downloads it.
-# It saves the video with the name "video.mp4".
+FILENAME = "track.mp3"
+
+# 1. Download the latest track using yt-dlp
 command = [
     "yt-dlp",
-    "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
     "--quiet",
     "--no-warnings",
-    "-f", "best[ext=mp4]", # Download best quality MP4
-    "--output", "video.mp4", # Save as video.mp4
-    "--match-filter", "!is_live", # Ignore live streams
-    "--playlist-end", "1", # Only download the very first video on the page (the latest)
-    YOUTUBE_CHANNEL_URL
+    "-f", "bestaudio",      # Download the best quality audio
+    "--extract-audio",      # Ensure we get an audio file
+    "--audio-format", "mp3",# Convert the audio to MP3
+    "--output", FILENAME,   # Save the file as track.mp3
+    "--playlist-end", "1",  # Only download the latest track
+    SOUNDCLOUD_USER_URL
 ]
 
 # Run the download command
 try:
-    # Ensure any old video is deleted first
-    if os.path.exists("video.mp4"):
-        os.remove("video.mp4")
-    
-    print("Downloading latest short video...")
+    if os.path.exists(FILENAME):
+        os.remove(FILENAME)
+
+    print("Downloading latest track from SoundCloud...")
     subprocess.run(command, check=True)
     print("Download complete.")
 except subprocess.CalledProcessError as e:
-    print(f"Error downloading video: {e}")
-    exit() # Stop the script if download fails
+    print(f"Error downloading track: {e}")
+    exit()
 
-# 2. Send the video to Telegram
-if os.path.exists("video.mp4"):
-    print("Sending video to Telegram...")
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendVideo"
-    files = {'video': open('video.mp4', 'rb')}
-    data = {'chat_id': CHAT_ID, 'caption': 'Here is your daily video!'}
-    
+# 2. Send the audio file to Telegram
+if os.path.exists(FILENAME):
+    print("Sending audio to Telegram...")
+    # Use the sendAudio method for music files
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendAudio"
+    files = {'audio': open(FILENAME, 'rb')}
+    data = {'chat_id': CHAT_ID, 'caption': 'Here is the latest track!'}
+
     response = requests.post(url, files=files, data=data)
-    
+
     if response.status_code == 200:
-        print("Video sent successfully!")
+        print("Audio sent successfully!")
     else:
-        print(f"Failed to send video. Response: {response.text}")
-        
+        print(f"Failed to send audio. Response: {response.text}")
+
     # 3. Clean up the downloaded file
-    os.remove("video.mp4")
-    print("Cleaned up video file.")
+    os.remove(FILENAME)
+    print("Cleaned up audio file.")
 else:
-    print("No video file found to send.")
+    print("No audio file found to send.")
