@@ -5,7 +5,7 @@ import os
 # --- GET DETAILS FROM GITHUB SECRETS ---
 BOT_TOKEN = os.environ.get("7592519816:AAG8_NU1A8cUw6jf0YuWnjReSRag08rpdJc")
 CHAT_ID = os.environ.get("1566333943")
-YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@catchthedit/shorts" # Change this to your desired channel
+YOUTUBE_CHANNEL_URL = "https://vid.puffyan.us/@catchthedit" # Change this to your desired channel
 
 # --- SCRIPT LOGIC (No need to edit below this line) ---
 
